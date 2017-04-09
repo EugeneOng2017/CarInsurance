@@ -1,0 +1,24 @@
+﻿@model CarInsuranceApplication.ViewModel.PolicyFormViewModel
+
+@{
+    ViewBag.Title = "ApplicationComplete";
+}
+
+<h2>Congratulations</h2>
+
+<p>
+    Dear
+    @if (Model.Policy.Driver.Gender == "Male")
+    {
+        <span>Mr.</span>
+    }
+    else
+    {
+        <span>Ms.</span>
+    }
+
+
+    @Model.Policy.Driver.Name, thank you for purchasing car insurance @Model.Policy.PlanName, 
+    you car will be insured from @Model.Policy.StartDate.ToString("MMM d, yyyy") to @Model.Policy.EndDate.ToString("MMM d, yyyy"). 
+    The premium amount of @Model.Policy.Amount will be charged to your account on @DateTime.Now.ToString("MMM d, yyyy").
+<p>

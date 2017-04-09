@@ -1,0 +1,46 @@
+﻿
+@model CarInsuranceApplication.ViewModel.PolicyFormViewModel
+@using CarInsuranceApplication.Models;
+
+@{
+    ViewBag.Title = "Step 2 of 2: Plan Selection Page";
+}
+
+<h2>Step 2 of 2: Plan Selection Page</h2>
+
+@using (Html.BeginForm("ApplicationComplete", "Policies"))
+{
+    <h4>Please select a plan</h4>
+    <div class="form-group">
+        <div class="radio">
+            @Html.RadioButtonFor(p => p.Policy.PlanName, "Plan 1", new { Checked = "checked" }) Plan 1: @Model.Plan1Price
+        </div>
+        @if (Model.Policy.Driver.DrivingExperienceId != DrivingExperience.LessThanAYear)
+        {
+            <div class="radio">
+                @Html.RadioButtonFor(p => p.Policy.PlanName, "Plan 2") Plan 2: @Model.Plan2Price
+            </div>
+            <div class="radio">
+                @Html.RadioButtonFor(p => p.Policy.PlanName, "Plan 3") Plan 3: @Model.Plan3Price
+            </div>
+        }
+    </div>
+
+    @Html.HiddenFor(m => m.Policy.Driver.Name);
+    @Html.HiddenFor(m => m.Policy.Driver.Gender);
+    @Html.HiddenFor(m => m.Policy.Driver.Occupation);
+    @Html.HiddenFor(m => m.Policy.Driver.Birthdate);
+    @Html.HiddenFor(m => m.Policy.Driver.DrivingExperienceId);
+    @Html.HiddenFor(m => m.Policy.Driver.Demerit);
+    @Html.HiddenFor(m => m.Policy.Driver.IsDemeritFree);
+    @Html.HiddenFor(m => m.Policy.StartDate);
+    @Html.HiddenFor(m => m.Policy.EndDate);
+    @Html.HiddenFor(m => m.Policy.Make);
+    @Html.HiddenFor(m => m.Policy.Model);
+    @Html.HiddenFor(m => m.BasePrice);
+
+
+    @Html.AntiForgeryToken()
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+}

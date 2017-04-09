@@ -1,0 +1,185 @@
+﻿@model CarInsuranceApplication.ViewModel.PolicyFormViewModel
+
+@{
+    ViewBag.Title = "Step 1 of 2: Quotation Page";
+}
+
+<h2>Step 1 of 2: Quotation Page</h2>
+
+@using (Html.BeginForm("Step2", "Policies"))
+{
+    <div class="row">
+        <div class="col-md-8 table-bordered">
+            <div class="panel-heading">
+                <h4>Tell Us More About Yourself</h4>
+            </div>
+            <div class="panel-body">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(p => p.Policy.Driver.Name)
+                        @Html.TextBoxFor(p => p.Policy.Driver.Name, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(p => p.Policy.Driver.Name)
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(p => p.Policy.Driver.Gender)
+                        <div class="radio">
+                            @Html.RadioButtonFor(p => p.Policy.Driver.Gender, "Male") Male
+                        </div>
+                        <div class="radio">
+                            @Html.RadioButtonFor(p => p.Policy.Driver.Gender, "Female") Female
+                        </div>
+                        @Html.ValidationMessageFor(p => p.Policy.Driver.Gender)
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(p => p.Policy.Driver.Birthdate)
+                        @Html.TextBoxFor(p => p.Policy.Driver.Birthdate, new { @class = "form-control", id = "Birthdate" })
+                        @Html.ValidationMessageFor(p => p.Policy.Driver.Birthdate)
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(p => p.Policy.Driver.Occupation)
+                        @Html.TextBoxFor(p => p.Policy.Driver.Occupation, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(p => p.Policy.Driver.Occupation)
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Policy.Driver.DrivingExperienceId)
+                        @Html.DropDownListFor(m => m.Policy.Driver.DrivingExperienceId, new SelectList(Model.DrivingExperiences, "Id", "Name"), "Select Driving Experience", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(p => p.Policy.Driver.DrivingExperienceId)
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            @Html.CheckBoxFor(m => m.Policy.Driver.IsDemeritFree, new { @id = "DemeritFree" }) Demerit point free?
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Policy.Driver.Demerit)
+                        @Html.TextBoxFor(m => m.Policy.Driver.Demerit, new { @class = "form-control", id = "Demerit" })
+                        @Html.ValidationMessageFor(p => p.Policy.Driver.Demerit)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 table-bordered">
+            <div class="panel-heading">
+                <h4>Let's Talk About Your Car</h4>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    @Html.LabelFor(p => p.Policy.Make)
+                    @Html.DropDownListFor(p => p.Policy.Make, new SelectList(Model.CarMake), "Select Car Make", new { @class = "form-control", id = "CarMake" })
+                    @Html.ValidationMessageFor(p => p.Policy.Make)
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(p => p.Policy.Model)
+                    @Html.DropDownListFor(p => p.CarId, Enumerable.Empty<SelectListItem>(), "Select Car Model", new { @class = "form-control", id = "CarModel" })
+                    @Html.ValidationMessageFor(p => p.Policy.Model)
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(p => p.Policy.StartDate)
+                    @Html.TextBoxFor(p => p.Policy.StartDate, new { @class = "form-control", id = "CoverageStart" })
+                    @Html.ValidationMessageFor(p => p.Policy.StartDate)
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(p => p.Policy.EndDate)
+                    @Html.TextBoxFor(p => p.ReadOnlyEndDate , new { @class = "form-control", id = "ReadOnlyCoverageEnd", disabled = "disabled" })
+                    @Html.HiddenFor(p => p.Policy.EndDate, new { @id = "CoverageEnd" })
+                    @Html.ValidationMessageFor(p => p.Policy.EndDate)
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <button type="submit" class="btn btn-primary">Next</button>
+}
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+            $('#Birthdate').datepicker({
+                autoclose: true
+            });
+
+            $('#CoverageStart').datepicker({
+                startDate: "Today",
+                autoclose: true
+            });
+
+            $('#DemeritFree').change(function () {
+                if ($('#DemeritFree').prop("checked") == true)
+                {
+                    $('#Demerit').attr("disabled", "disabled");
+                    $('#Demerit').val('');
+                }
+                else
+                {
+                    $('#Demerit').removeAttr('disabled');
+                    $('#Demerit').attr('enabled', 'enabled');
+                }
+                console.log($('#DemeritFree').prop("checked"));
+            });
+
+            $('select#CarMake').change(function () {
+                var CarMake = $(this).val();
+
+                $.ajax({
+                    url: 'LoadCarModels',
+                    type: 'POST',
+                    data: JSON.stringify({ CarMake: CarMake }),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        $('select#CarModel').empty();
+                        $('select#CarModel').append('<option value="0">Select Car Model</option>');
+                        $.each(data, function (key, CarModel) {
+                            console.log(CarModel);
+                            $('select#CarModel').append(
+                                '<option value="' + CarModel.Id + '">'
+                                + CarModel.Model +
+                                '</option>');
+                        });
+                    }
+                });
+            });
+
+            $("#CoverageStart").change(function () {
+
+                var str = $("#CoverageStart").val();
+
+                if (/^\d{2}\/\d{2}\/\d{4}$/i.test(str)) {
+
+                    var parts = str.split("/");
+
+                    var month = parts[0] && parseInt(parts[0], 10);
+                    var day = parts[1] && parseInt(parts[1], 10);
+                    var year = parts[2] && parseInt(parts[2], 10);
+
+                    if (day <= 31 && day >= 1 && month <= 12 && month >= 1) {
+
+                        var expiryDate = new Date(year, month - 1, day);
+                        expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+
+                        var month = ('0' + expiryDate.getDate()).slice(-2);
+                        var day = ('0' + (expiryDate.getMonth() + 1)).slice(-2);
+                        var year = expiryDate.getFullYear();
+
+                        $("#ReadOnlyCoverageEnd").val(day + "/" + month + "/" + year);
+                        $("#CoverageEnd").val(day + "/" + month + "/" + year);
+
+                    } else {
+                        // display error message
+                    }
+                }
+            });
+        });
+    </script>
+
+}
