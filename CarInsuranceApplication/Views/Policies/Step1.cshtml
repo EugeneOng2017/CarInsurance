@@ -9,7 +9,7 @@
 @using (Html.BeginForm("Step2", "Policies"))
 {
     <div class="row">
-        <div class="col-md-8 table-bordered">
+        <div class="col-md-8">
             <div class="panel-heading">
                 <h4>Tell Us More About Yourself</h4>
             </div>
@@ -65,7 +65,7 @@
             </div>
         </div>
 
-        <div class="col-md-4 table-bordered">
+        <div class="col-md-4">
             <div class="panel-heading">
                 <h4>Let's Talk About Your Car</h4>
             </div>
@@ -148,6 +148,38 @@
                         });
                     }
                 });
+            });
+
+            $("#Birthdate").change(function () {
+                var str = $("#Birthdate").val();
+
+                if (/^\d{2}\/\d{2}\/\d{4}$/i.test(str)) {
+
+                    var parts = str.split("/");
+
+                    var month = parts[0] && parseInt(parts[0], 10);
+                    var day = parts[1] && parseInt(parts[1], 10);
+                    var year = parts[2] && parseInt(parts[2], 10);
+
+                    console.log(month);
+                    console.log(day);
+                    console.log(year);
+
+
+                    var mydate = new Date();
+
+                    mydate.setFullYear(year, month - 1, day);
+
+                    var currdate = new Date();
+                    var setDate = new Date();
+                    setDate.setFullYear(mydate.getFullYear() + 18, month - 1, day);
+
+                    if ((currdate - setDate) > 0) {
+                    } else {
+                        alert("You must at least be 18 years old to apply");
+                        $("#Birthdate").val('')
+                    }
+                }
             });
 
             $("#CoverageStart").change(function () {
