@@ -44,3 +44,24 @@
 
     <button type="submit" class="btn btn-primary">Submit</button>
 }
+@using (Html.BeginForm("Step1", "Policies"))
+{
+    @Html.HiddenFor(m => m.Policy.Driver.Name);
+    @Html.HiddenFor(m => m.Policy.Driver.Gender);
+    @Html.HiddenFor(m => m.Policy.Driver.Occupation);
+    @Html.HiddenFor(m => m.Policy.Driver.Birthdate);
+    @Html.HiddenFor(m => m.Policy.Driver.DrivingExperienceId);
+    @Html.HiddenFor(m => m.Policy.Driver.Demerit);
+    @Html.HiddenFor(m => m.Policy.Driver.IsDemeritFree);
+    @Html.HiddenFor(m => m.Policy.StartDate);
+    @Html.HiddenFor(m => m.ReadOnlyEndDate);
+    @Html.HiddenFor(m => m.Policy.EndDate);
+    @Html.HiddenFor(m => m.Policy.Make);
+    @Html.HiddenFor(m => m.Policy.Model);
+    @Html.HiddenFor(m => m.BasePrice);
+
+
+    @Html.AntiForgeryToken()
+
+    <button type="submit" class="btn btn-primary">Back</button>
+}

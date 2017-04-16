@@ -78,7 +78,7 @@
 
                 <div class="form-group">
                     @Html.LabelFor(p => p.Policy.Model)
-                    @Html.DropDownListFor(p => p.CarId, Enumerable.Empty<SelectListItem>(), "Select Car Model", new { @class = "form-control", id = "CarModel" })
+                    @Html.DropDownListFor(p => p.CarId,  Enumerable.Empty<SelectListItem>(), Model.Policy == null ? "Select Car Model" : Model.Policy.Model, new { @class = "form-control", id = "CarModel" })
                     @Html.ValidationMessageFor(p => p.Policy.Model)
                 </div>
                 <div class="form-group">
@@ -88,7 +88,7 @@
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(p => p.Policy.EndDate)
-                    @Html.TextBoxFor(p => p.ReadOnlyEndDate , new { @class = "form-control", id = "ReadOnlyCoverageEnd", disabled = "disabled" })
+                    @Html.TextBoxFor(p => p.ReadOnlyEndDate, new { @class = "form-control", id = "ReadOnlyCoverageEnd", disabled = "disabled" })
                     @Html.HiddenFor(p => p.Policy.EndDate, new { @id = "CoverageEnd" })
                     @Html.ValidationMessageFor(p => p.Policy.EndDate)
                 </div>
@@ -104,14 +104,73 @@
     @Scripts.Render("~/bundles/jqueryval")
     <script>
         $(document).ready(function () {
+            $(window).load(function () {
+                var CarMake = $('#CarMake').val();
+
+                $.ajax({
+                    url: 'LoadCarModels',
+                    type: 'POST',
+                    data: JSON.stringify({ CarMake: CarMake }),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        $.each(data, function (key, CarModel) {
+                            $('select#CarModel').append(
+                                '<option value="' + CarModel.Id + '">'
+                                + CarModel.Model +
+                                '</option>');
+                        });
+                    }
+                });
+
+
+                var str = $("#CoverageStart").val();
+
+                if (/^\d{2}\/\d{2}\/\d{4}$/i.test(str)) {
+
+                    var parts = str.split("/");
+
+                    var month = parts[0] && parseInt(parts[0], 10);
+                    var day = parts[1] && parseInt(parts[1], 10);
+                    var year = parts[2] && parseInt(parts[2], 10);
+
+                    if (day <= 31 && day >= 1 && month <= 12 && month >= 1) {
+
+                        var expiryDate = new Date(year, month - 1, day);
+                        expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+
+                        var month = ('0' + expiryDate.getDate()).slice(-2);
+                        var day = ('0' + (expiryDate.getMonth() + 1)).slice(-2);
+                        var year = expiryDate.getFullYear();
+
+                        $("#ReadOnlyCoverageEnd").val(day + "/" + month + "/" + year);
+                        $("#CoverageEnd").val(day + "/" + month + "/" + year);
+
+                    } else {
+                        // display error message
+                    }
+                }
+
+                if ($('#DemeritFree').prop("checked") == true) {
+                    $('#Demerit').attr("disabled", "disabled");
+                    $('#Demerit').val('');
+                }
+
+            });
+
+
+
+
             $('#Birthdate').datepicker({
                 autoclose: true
             });
+
 
             $('#CoverageStart').datepicker({
                 startDate: "Today",
                 autoclose: true
             });
+
 
             $('#DemeritFree').change(function () {
                 if ($('#DemeritFree').prop("checked") == true)
@@ -127,6 +186,7 @@
                 console.log($('#DemeritFree').prop("checked"));
             });
 
+
             $('select#CarMake').change(function () {
                 var CarMake = $(this).val();
 
@@ -140,7 +200,6 @@
                         $('select#CarModel').empty();
                         $('select#CarModel').append('<option value="0">Select Car Model</option>');
                         $.each(data, function (key, CarModel) {
-                            console.log(CarModel);
                             $('select#CarModel').append(
                                 '<option value="' + CarModel.Id + '">'
                                 + CarModel.Model +
@@ -149,6 +208,7 @@
                     }
                 });
             });
+
 
             $("#Birthdate").change(function () {
                 var str = $("#Birthdate").val();
@@ -160,11 +220,6 @@
                     var month = parts[0] && parseInt(parts[0], 10);
                     var day = parts[1] && parseInt(parts[1], 10);
                     var year = parts[2] && parseInt(parts[2], 10);
-
-                    console.log(month);
-                    console.log(day);
-                    console.log(year);
-
 
                     var mydate = new Date();
 
@@ -181,6 +236,7 @@
                     }
                 }
             });
+
 
             $("#CoverageStart").change(function () {
 

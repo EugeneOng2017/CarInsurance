@@ -39,13 +39,15 @@ namespace CarInsuranceApplication.Controllers
 
         public ActionResult Step1(PolicyFormViewModel viewModel)
         {
-            if(viewModel.Policy == null)
-            {
-                List<DrivingExperience> drivingExperiences =
-                    _context.DrivingExperiences.ToList();
+            List<DrivingExperience> drivingExperiences;
 
-                List<string> carMake =
-                    _context.CarModels.Select(Car => Car.Make).Distinct().ToList();
+            List<string> carMake;
+
+            if (viewModel.Policy == null)
+            {
+                drivingExperiences = _context.DrivingExperiences.ToList();
+
+                carMake = _context.CarModels.Select(Car => Car.Make).Distinct().ToList();
 
                 PolicyFormViewModel newViewModel = new PolicyFormViewModel
                 {
@@ -55,6 +57,13 @@ namespace CarInsuranceApplication.Controllers
 
                 return View(newViewModel);
             }
+
+            drivingExperiences = _context.DrivingExperiences.ToList();
+
+            carMake = _context.CarModels.Select(Car => Car.Make).Distinct().ToList();
+
+            viewModel.DrivingExperiences = drivingExperiences;
+            viewModel.CarMake = carMake;
 
             return View(viewModel);
         }
